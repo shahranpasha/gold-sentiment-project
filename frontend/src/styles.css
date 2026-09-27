@@ -1,0 +1,463 @@
+/* ============================================================
+   DESIGN TOKENS
+   A bound trading-ledger aesthetic: warm near-black paper, a
+   single brass accent, hairline rules instead of card shadows,
+   tabular monospace for every number.
+   ============================================================ */
+
+:root {
+  --ink: #14110d;
+  --panel: #1c1811;
+  --panel-raised: #221c14;
+  --hairline: rgba(201, 162, 39, 0.16);
+  --hairline-strong: rgba(201, 162, 39, 0.32);
+
+  --brass: #c9a227;
+  --brass-bright: #e8c558;
+  --parchment: #ede6d6;
+  --muted: #a39a86;
+  --muted-dim: #6f6858;
+
+  --sage: #8fae72;
+  --rust: #c06a4e;
+
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-sans: "Public Sans", -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+a {
+  color: var(--brass-bright);
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------------------
+   SIDEBAR
+   ------------------------------------------------------------ */
+.sidebar {
+  border-right: 1px solid var(--hairline);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sidebar-mark {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  line-height: 1.25;
+  color: var(--brass-bright);
+}
+
+.sidebar-mark span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted-dim);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--muted);
+  padding: 9px 10px;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.nav-item:hover {
+  color: var(--parchment);
+}
+
+.nav-item.active {
+  color: var(--brass-bright);
+  border-left-color: var(--brass);
+  background: var(--panel);
+}
+
+.sidebar-meta {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted-dim);
+  line-height: 1.9;
+  border-top: 1px solid var(--hairline);
+  padding-top: 16px;
+}
+
+.sidebar-meta b {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------
+   MAIN
+   ------------------------------------------------------------ */
+.main {
+  padding: 36px 44px 60px;
+  max-width: 1180px;
+}
+
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+
+.page-subtitle {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0 0 28px;
+}
+
+/* ------------------------------------------------------------
+   HERO — the one bold moment
+   ------------------------------------------------------------ */
+.hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding-bottom: 26px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--hairline-strong);
+}
+
+.hero-price-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted-dim);
+  margin-bottom: 6px;
+}
+
+.hero-price {
+  font-family: var(--font-serif);
+  font-size: 3.4rem;
+  font-weight: 500;
+  color: var(--parchment);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-price small {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-left: 10px;
+}
+
+.hero-date {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted-dim);
+  margin-top: 6px;
+}
+
+.hero-call {
+  text-align: right;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: 1px solid;
+}
+
+.badge.up {
+  color: var(--sage);
+  border-color: rgba(143, 174, 114, 0.4);
+  background: rgba(143, 174, 114, 0.08);
+}
+
+.badge.down {
+  color: var(--rust);
+  border-color: rgba(192, 106, 78, 0.4);
+  background: rgba(192, 106, 78, 0.08);
+}
+
+.hero-confidence {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--muted-dim);
+  margin-top: 8px;
+}
+
+/* ------------------------------------------------------------
+   LEDGER PANELS (replaces the generic rounded-card kit)
+   ------------------------------------------------------------ */
+.ledger {
+  border: 1px solid var(--hairline);
+  background: var(--panel);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+
+.ledger-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.ledger-head h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.02rem;
+  margin: 0;
+}
+
+.ledger-head .hint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted-dim);
+}
+
+.ledger-body {
+  padding: 18px 20px 20px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .sidebar-meta {
+    display: none;
+  }
+}
+
+/* stat rows */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: 0.88rem;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row .label {
+  color: var(--muted);
+}
+
+.stat-row .value {
+  font-family: var(--font-mono);
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+/* metric tiles */
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  margin-bottom: 24px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.metric-tile {
+  background: var(--panel);
+  padding: 14px 18px;
+}
+
+.metric-tile .m-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted-dim);
+  margin-bottom: 6px;
+}
+
+.metric-tile .m-value {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+/* news list */
+.news-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.news-item:last-child {
+  border-bottom: none;
+}
+
+.news-title {
+  font-size: 0.9rem;
+  color: var(--parchment);
+}
+
+.news-meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted-dim);
+  margin-top: 4px;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--hairline-strong);
+  color: var(--muted);
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.tag.positive {
+  color: var(--sage);
+  border-color: rgba(143, 174, 114, 0.4);
+}
+
+.tag.negative {
+  color: var(--rust);
+  border-color: rgba(192, 106, 78, 0.4);
+}
+
+/* limitation note */
+.note {
+  font-size: 0.84rem;
+  color: var(--muted);
+  border-left: 2px solid var(--brass);
+  padding: 10px 16px;
+  background: var(--panel-raised);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 24px;
+}
+
+.disclaimer {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted-dim);
+  border-top: 1px solid var(--hairline);
+  padding-top: 16px;
+  margin-top: 12px;
+}
+
+.loading,
+.error-box {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 40px 0;
+}
+
+.error-box {
+  color: var(--rust);
+}
+
+.period-select {
+  display: flex;
+  gap: 6px;
+}
+
+.period-select button {
+  background: none;
+  border: 1px solid var(--hairline);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.period-select button.active {
+  color: var(--brass-bright);
+  border-color: var(--brass);
+}
+
+.about-copy {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--parchment);
+  max-width: 68ch;
+}
+
+.about-copy h4 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  margin: 22px 0 8px;
+  color: var(--brass-bright);
+}
+
+.about-copy ul {
+  margin: 6px 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
