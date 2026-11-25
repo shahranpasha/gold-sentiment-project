@@ -1,5 +1,8 @@
 venv/
 .env
+.env.*
+!.env.example
+!frontend/.env.example
 __pycache__/
 *.pyc
 *.pyo
@@ -9,3 +12,13 @@ __pycache__/
 
 frontend/node_modules/
 frontend/dist/
+data/gold_prices_25y.csv
+data/news_archive_export.csv
+data/raw_news_archive.csv
+data/gdelt_macro_tone_export.csv
+data/gdelt_daily_macro_tone.csv
+data/live_news.csv
+data/gold_sentiment.sqlite3
+data/gold_sentiment.sqlite3-shm
+data/gold_sentiment.sqlite3-wal
+download/

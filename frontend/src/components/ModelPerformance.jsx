@@ -17,10 +17,13 @@ export default function ModelPerformance() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    api
-      .modelPerformance()
-      .then(setData)
-      .catch((e) => setError(e.message));
+    let active = true;
+    const load = () => api.modelPerformance().then((value) => {
+      if (active) { setData(value); setError(null); }
+    }).catch((e) => { if (active) setError(e.message); });
+    load();
+    const timer = window.setInterval(load, 30 * 60 * 1000);
+    return () => { active = false; window.clearInterval(timer); };
   }, []);
 
   /* =========================================================
@@ -194,6 +197,27 @@ export default function ModelPerformance() {
       </div>
 
 
+      {data.latest_signal && (
+        <section className="relative overflow-hidden rounded-[20px] border border-[#c9a45b]/15 bg-[#0c0e10] p-5 sm:rounded-[24px] sm:p-7">
+          <div className="pointer-events-none absolute right-[-70px] top-[-100px] h-[220px] w-[260px] rounded-full bg-[#c9a45b]/[0.04] blur-[85px]" />
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#a8894c]">Latest available market signal</p>
+              <p className="mt-2 text-[12px] text-[#777b81]">Price input date <span className="font-mono text-[#d5c28f]">{data.latest_signal.input_date}</span> · gold close <span className="font-mono text-[#d5c28f]">${Number(data.latest_signal.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></p>
+              <p className="mt-1 text-[10px] text-[#62676e]">Historical scored-news features through {data.latest_signal.scored_news_through}; newer live headlines are not scored into this signal.</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className={`rounded-full border px-4 py-2 font-mono text-sm ${data.latest_signal.direction === "UP" ? "border-emerald-400/20 bg-emerald-400/[0.05] text-emerald-300" : "border-red-400/20 bg-red-400/[0.05] text-red-300"}`}>{data.latest_signal.direction}</span>
+              <div>
+                <p className="text-[8px] uppercase tracking-[0.15em] text-[#555b61]">Model confidence</p>
+                <p className="mt-1 font-mono text-lg text-[#d9b968]">{pct(data.latest_signal.confidence)}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+
       {/* =====================================================
           TEST SET SUMMARY
       ===================================================== */}
@@ -292,20 +316,20 @@ export default function ModelPerformance() {
               <div className="flex flex-wrap items-center gap-2">
 
                 <h3 className="text-[17px] font-medium text-[#e9e5dd] sm:text-lg lg:text-xl">
-                  Recent test predictions
+                  Held-out test predictions
                 </h3>
 
                 <span className="h-1 w-1 shrink-0 rounded-full bg-[#c9a45b]/70" />
 
                 <span className="text-[9px] uppercase tracking-[0.15em] text-[#555b62] sm:text-[10px]">
-                  Test Set
+                  Historical Test Set
                 </span>
 
               </div>
 
 
               <p className="mt-1 text-[11px] leading-5 text-[#60656c] sm:text-xs lg:text-[13px]">
-                Actual versus predicted directional calls
+                Actual versus predicted calls · latest evaluation date {data.evaluation_data_end ?? "—"}
               </p>
 
             </div>

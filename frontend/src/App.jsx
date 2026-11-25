@@ -1,104 +1,76 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-
 import Navbar from "./components/Navbar.jsx";
-
+import Footer from "./components/Footer.jsx";
+import PageLayout from "./components/PageLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-
 import PriceChart from "./components/PriceChart.jsx";
 import SentimentPanel from "./components/SentimentPanel.jsx";
 import MacroGrid from "./components/MacroGrid.jsx";
 import ModelPerformance from "./components/ModelPerformance.jsx";
 import About from "./components/About.jsx";
 
-
 export default function App() {
   return (
     <BrowserRouter>
-
-      <div className="min-h-screen bg-[#08090b]">
-
+      <div className="app-frame">
         <Navbar />
-
-        <Routes>
-
-          <Route
-            path="/"
-            element={<Navigate to="/dashboard" replace />}
-          />
-
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-
-          <Route
-            path="/gold-price"
-            element={
-              <div className="p-8">
-                <h1 className="mb-6 text-3xl text-white">
-                  Gold Price
-                </h1>
-
-                <PriceChart
-                  defaultPeriod="365"
-                  height={420}
-                />
-              </div>
-            }
-          />
-
-          <Route
-            path="/sentiment"
-            element={
-              <div className="p-8">
-                <h1 className="mb-6 text-3xl text-white">
-                  Sentiment
-                </h1>
-
-                <SentimentPanel
-                  days={60}
-                  showNews={true}
-                  height={280}
-                />
-              </div>
-            }
-          />
-
-          <Route
-            path="/economic-indicators"
-            element={
-              <div className="p-8">
-                <h1 className="mb-6 text-3xl text-white">
-                  Economic Indicators
-                </h1>
-
-                <MacroGrid />
-              </div>
-            }
-          />
-
-          <Route
-            path="/model-performance"
-            element={
-              <div className="p-8">
-                <h1 className="mb-6 text-3xl text-white">
-                  Model Performance
-                </h1>
-
-                <ModelPerformance />
-              </div>
-            }
-          />
-
-          <Route
-            path="/about"
-            element={<About />}
-          />
-
-        </Routes>
-
+        <div className="app-main">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/gold-price"
+              element={
+                <PageLayout
+                  eyebrow="Market data"
+                  title="Gold price"
+                  description="Daily gold futures history, price movement, and technical averages."
+                >
+                  <PriceChart defaultPeriod="365" height={420} />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/sentiment"
+              element={
+                <PageLayout
+                  eyebrow="News intelligence"
+                  title="Sentiment"
+                  description="Daily national and international gold headlines alongside stored sentiment analysis."
+                >
+                  <SentimentPanel days={60} showNews height={280} />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/economic-indicators"
+              element={
+                <PageLayout
+                  eyebrow="Macro context"
+                  title="Economic indicators"
+                  description="Macroeconomic series used to study the conditions surrounding gold prices."
+                >
+                  <MacroGrid />
+                </PageLayout>
+              }
+            />
+            <Route
+              path="/model-performance"
+              element={
+                <PageLayout
+                  eyebrow="Model evaluation"
+                  title="Model performance"
+                  description="Current signal from the latest stored gold session, alongside clearly dated historical test results."
+                >
+                  <ModelPerformance />
+                </PageLayout>
+              }
+            />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </div>
+        <Footer />
       </div>
-
     </BrowserRouter>
   );
 }

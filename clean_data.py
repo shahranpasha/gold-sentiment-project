@@ -11,10 +11,12 @@ DATA_DIR = PROJECT_ROOT / "data"
 
 MARKETAUX_FILE = DATA_DIR / "raw_news.csv"
 NEWSAPI_FILE = PROJECT_ROOT / "gold_news.csv"
+NEWS_ARCHIVE_FILE = DATA_DIR / "raw_news_archive.csv"
 
 CLEAN_NEWS_FILE = DATA_DIR / "gold_news_clean.csv"
 CLEAN_PRICES_FILE = DATA_DIR / "gold_prices_clean.csv"
-PRICE_FILE = DATA_DIR / "gold_prices.csv"
+API_PRICE_FILE = DATA_DIR / "gold_prices_25y.csv"
+PRICE_FILE = API_PRICE_FILE if API_PRICE_FILE.exists() else DATA_DIR / "gold_prices.csv"
 
 
 # ==========================================================
@@ -71,12 +73,25 @@ else:
     print(NEWSAPI_FILE)
 
 
+# ----------------------------------------------------------
+# Load normalized historical archive data when available
+# ----------------------------------------------------------
+
+if NEWS_ARCHIVE_FILE.exists():
+    print("\nLoading historical news archive data:")
+    print(NEWS_ARCHIVE_FILE)
+    archive = pd.read_csv(NEWS_ARCHIVE_FILE)
+    print(f"Historical archive articles found: {len(archive)}")
+    news_frames.append(archive)
+
+
 # Stop if no news files were found
 if not news_frames:
     raise FileNotFoundError(
         "\nNo news files were found.\n"
         f"Expected Marketaux file: {MARKETAUX_FILE}\n"
-        f"Expected NewsAPI file: {NEWSAPI_FILE}"
+        f"Expected NewsAPI file: {NEWSAPI_FILE}\n"
+        f"Optional historical archive file: {NEWS_ARCHIVE_FILE}"
     )
 
 
@@ -409,6 +424,9 @@ print("NEWS CLEANING COMPLETE")
 print("=" * 55)
 
 print(f"Final news articles: {len(news)}")
+if len(news) > 0:
+    print(f"News date range: {news['date'].min().date()} to {news['date'].max().date()}")
+    print(f"Distinct dates with news: {news['date'].dt.date.nunique()}")
 
 print("\nSaved to:")
 print(CLEAN_NEWS_FILE)
@@ -451,6 +469,7 @@ if not PRICE_FILE.exists():
 prices = pd.read_csv(
     PRICE_FILE
 )
+print(f"Using price input: {PRICE_FILE}")
 
 
 print(f"\nPrice rows before cleaning: {len(prices)}")

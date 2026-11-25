@@ -57,6 +57,7 @@ MODEL_PATH = "Models/lstm_gold.pt"
 CHART_PATH = "Models/training_curves.png"
 
 DATA_PATH = "data/final_dataset.csv"
+NEWS_OVERLAP_START = pd.Timestamp("2015-02-19")
 
 os.makedirs("Models", exist_ok=True)
 
@@ -100,8 +101,10 @@ df["date"] = pd.to_datetime(
 )
 
 df = df.sort_values("date").reset_index(drop=True)
+df = df[df["date"] >= NEWS_OVERLAP_START].reset_index(drop=True)
 
 print(f"Rows loaded : {len(df)}")
+print(f"News overlap era starts: {NEWS_OVERLAP_START.date()}")
 
 print(
     f"Date range  : {df['date'].min().date()} "

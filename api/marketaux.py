@@ -17,7 +17,7 @@ print(".env Found   :", ENV_FILE.exists())
 
 
 
-API_KEY = "c3awwR5rZgfdA0rHnwWIoaWUqo6kN2M2t2sv8jbf"
+API_KEY = os.getenv("MARKETAUX_API_KEY")
 
 if not API_KEY:
     raise ValueError(

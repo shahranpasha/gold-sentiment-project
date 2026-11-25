@@ -32,13 +32,16 @@ export default function MacroGrid() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    api
-      .macro()
-      .then((d) => {
+    let active = true;
+    const load = () => api.macro().then((d) => {
+        if (!active) return;
         setData(d);
-        setSelected(d.available[0]);
-      })
-      .catch((e) => setError(e.message));
+        setSelected((current) => current && d.available.includes(current) ? current : d.available[0]);
+        setError(null);
+      }).catch((e) => { if (active) setError(e.message); });
+    load();
+    const timer = window.setInterval(load, 30 * 60 * 1000);
+    return () => { active = false; window.clearInterval(timer); };
   }, []);
 
   /* =========================================================
@@ -164,7 +167,7 @@ export default function MacroGrid() {
 
 
               <p className="mt-1 text-[11px] leading-5 text-[#60656c] sm:text-xs lg:text-[13px]">
-                Current macroeconomic conditions used by the model
+                Latest macro releases aligned to gold sessions; reporting lags vary by indicator.
               </p>
 
             </div>

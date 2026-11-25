@@ -13,12 +13,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 load_dotenv(PROJECT_ROOT / ".env")
 
-API_KEY = "TQ598WJF0FXWQXOZ"
+API_KEY = os.getenv("ALPHAVANTAGE_API_KEY")
 
 if not API_KEY:
     raise ValueError("ALPHAVANTAGE_API_KEY not found in .env")
 
-print("✓ Alpha Vantage API Key Loaded")
+print("✓ Alpha Vantage API key loaded from environment")
 
 # ===========================================
 # Download Gold Spot Price

@@ -19,7 +19,8 @@ const PERIODS = [
   { key: "90", label: "90d" },
   { key: "180", label: "180d" },
   { key: "365", label: "1y" },
-  { key: "all", label: "All" },
+  { key: "1825", label: "5y" },
+  { key: "25y", label: "25y" },
 ];
 
 export default function PriceChart({
@@ -59,6 +60,15 @@ export default function PriceChart({
     return () => {
       cancelled = true;
     };
+  }, [period]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      api.price(period).then((d) => setRows(d.dates.map((date, i) => ({
+        date, close: d.close[i], ma7: d.ma7[i], ma20: d.ma20[i],
+      })))).catch((e) => setError(e.message));
+    }, 30 * 60 * 1000);
+    return () => window.clearInterval(timer);
   }, [period]);
 
   /*
@@ -354,6 +364,8 @@ export default function PriceChart({
                     stroke: "rgba(255,255,255,0.05)",
                   }}
                   tickLine={false}
+                  interval="preserveStartEnd"
+                  padding={{ left: 4, right: 88 }}
                   minTickGap={45}
                   tickMargin={8}
                 />

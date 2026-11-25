@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+venv
+__pycache__
+*.pyc
+frontend/node_modules
+frontend/dist
+download
+data/*.sqlite3
+data/*.sqlite3-shm
+data/*.sqlite3-wal
+data/live_news.csv

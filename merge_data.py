@@ -10,6 +10,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 NEWS_FILE = BASE_DIR / "data" / "sentiment_news.csv"
+GDELT_TONE_FILE = BASE_DIR / "data" / "gdelt_daily_macro_tone.csv"
 PRICE_FILE = BASE_DIR / "data" / "gold_prices_clean.csv"
 FRED_FILE = BASE_DIR / "data" / "fred_data.csv"
 
@@ -32,6 +33,7 @@ fred = pd.read_csv(FRED_FILE)
 print("\nNews rows:", len(news))
 print("Price rows:", len(prices))
 print("FRED rows:", len(fred))
+print("News source date span:", news["date"].min(), "to", news["date"].max())
 
 
 print("\nNews columns:")
@@ -242,6 +244,25 @@ daily_sentiment = (
 
 )
 
+# Use historical GDELT macro-news tone on dates it covers. This is GDELT's
+# calculated article tone, not a FinBERT label; recent FinBERT remains fallback.
+if GDELT_TONE_FILE.exists():
+    gdelt = pd.read_csv(GDELT_TONE_FILE)
+    required = {"date", "sentiment_score", "article_count", "positive_count", "negative_count", "neutral_count"}
+    missing = required.difference(gdelt.columns)
+    if missing:
+        raise ValueError(f"GDELT daily tone file is missing columns: {sorted(missing)}")
+    gdelt["date"] = pd.to_datetime(gdelt["date"], errors="coerce", utc=True).dt.tz_localize(None).dt.normalize()
+    gdelt = gdelt.dropna(subset=["date"]).drop_duplicates("date", keep="last")
+    if "avg_confidence" not in gdelt:
+        gdelt["avg_confidence"] = 0.0
+    gdelt = gdelt[["date", "sentiment_score", "article_count", "positive_count", "negative_count", "neutral_count", "avg_confidence"]]
+    daily_sentiment = daily_sentiment[~daily_sentiment["date"].isin(gdelt["date"])]
+    daily_sentiment = pd.concat([daily_sentiment, gdelt], ignore_index=True).sort_values("date")
+    print(f"GDELT tone rows used: {len(gdelt)} ({gdelt['date'].min().date()} to {gdelt['date'].max().date()})")
+else:
+    print(f"No GDELT tone export found at {GDELT_TONE_FILE}; using existing FinBERT news only.")
+
 
 print("\nDaily sentiment sample:")
 
@@ -369,6 +390,12 @@ if len(fred_columns) > 0:
 
 
 print("FRED data merged successfully.")
+
+# Keep the complete gold series in the source file, but train on the
+# gold/news overlap era supported by GDELT 2.0's historical archive.
+news_overlap_start = pd.Timestamp("2015-02-19")
+merged = merged[merged["date"] >= news_overlap_start].copy()
+print(f"Training dataset start limited to gold/news overlap era: {news_overlap_start.date()}")
 
 
 # ==========================================================
@@ -551,6 +578,12 @@ print(
     f"Days without news: "
     f"{int((merged['article_count'] == 0).sum())}"
 )
+
+news_days = int((merged["article_count"] > 0).sum())
+coverage = news_days / max(len(merged), 1) * 100
+print(f"Price/news overlap: {news_days} of {len(merged)} trading days ({coverage:.2f}%)")
+if GDELT_TONE_FILE.exists():
+    print("Note: GDELT macro tone is metadata-derived overall article tone, not gold-specific full-text FinBERT sentiment.")
 
 
 print(

@@ -11,6 +11,7 @@ import {
 import Hero from "../components/Hero.jsx";
 import PriceChart from "../components/PriceChart.jsx";
 import SentimentPanel from "../components/SentimentPanel.jsx";
+import DataCoverage from "../components/DataCoverage.jsx";
 import { api } from "../api";
 
 export default function Dashboard() {
@@ -18,10 +19,13 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    api
-      .dashboard()
-      .then(setDashboard)
-      .catch((e) => setError(e.message));
+    let active = true;
+    const load = () => api.dashboard().then((value) => {
+      if (active) { setDashboard(value); setError(null); }
+    }).catch((e) => { if (active) setError(e.message); });
+    load();
+    const timer = window.setInterval(load, 30 * 60 * 1000);
+    return () => { active = false; window.clearInterval(timer); };
   }, []);
 
   /* =========================================================
@@ -30,8 +34,8 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen overflow-x-hidden bg-[#070809] px-4 py-8 text-white sm:px-6 sm:py-10 lg:px-10 lg:py-14 xl:px-14">
-        <div className="mx-auto max-w-[1600px]">
+      <div className="min-h-screen overflow-x-hidden px-4 py-8 text-white sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+        <div className="mx-auto max-w-[1480px]">
           <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.04] p-6 sm:rounded-[24px] sm:p-8 lg:p-10">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-400 sm:text-xs">
               Connection Error
@@ -60,7 +64,7 @@ export default function Dashboard() {
 
   if (!dashboard) {
     return (
-      <div className="flex min-h-[80vh] items-center justify-center overflow-x-hidden bg-[#070809] px-5">
+      <div className="flex min-h-[70vh] items-center justify-center overflow-x-hidden px-5">
         <div className="text-center">
           <div className="relative mx-auto mb-6 h-12 w-12">
             <div className="absolute inset-0 rounded-full border border-[#c9a45b]/20" />
@@ -77,7 +81,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-[#070809] text-[#eeeae2]">
+    <div className="relative w-full overflow-x-hidden text-[#eeeae2]">
 
       {/* =====================================================
           BACKGROUND GLOW
@@ -92,7 +96,7 @@ export default function Dashboard() {
           MAIN CONTAINER
       ===================================================== */}
 
-      <div className="relative mx-auto w-full max-w-[1700px] px-4 pb-12 pt-6 sm:px-6 sm:pb-16 sm:pt-8 md:px-8 lg:px-10 lg:pt-12 xl:px-12 2xl:px-16">
+      <div className="relative mx-auto w-full max-w-[1560px] px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-10 lg:pt-10">
 
 
         {/* =====================================================
@@ -122,12 +126,12 @@ export default function Dashboard() {
               </div>
 
 
-              <h1 className="text-[40px] font-semibold leading-[0.95] tracking-[-0.045em] text-[#f4f0e8] sm:text-[48px] md:text-[54px] lg:text-[64px] xl:text-[68px]">
+              <h1 className="page-heading">
                 Gold Sentiment
               </h1>
 
 
-              <p className="mt-4 max-w-2xl text-[14px] leading-6 text-[#70757c] sm:text-[16px] sm:leading-7 lg:mt-5 lg:text-[17px] lg:leading-8">
+              <p className="page-description mt-3">
                 Deep-learning based analysis of gold price direction,
                 financial-news sentiment, and macroeconomic signals.
               </p>
@@ -333,6 +337,10 @@ export default function Dashboard() {
         </section>
 
 
+        {/* DATA COVERAGE */}
+        <DataCoverage />
+
+
         {/* =====================================================
             SENTIMENT
         ===================================================== */}
@@ -475,7 +483,7 @@ function SectionHeading({
 
         <div className="mt-2 flex items-center gap-3">
 
-          <h2 className="text-[23px] font-medium leading-tight tracking-[-0.025em] text-[#e9e5dd] sm:text-[27px] md:text-[30px] lg:text-[32px] xl:text-[34px]">
+          <h2 className="text-[22px] font-semibold leading-tight tracking-[-0.035em] text-[#e9e5dd] sm:text-2xl">
             {title}
           </h2>
 

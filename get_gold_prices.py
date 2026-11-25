@@ -4,8 +4,8 @@ import pandas as pd
 # GC=F is the ticker symbol for Gold Futures on Yahoo Finance
 gold = yf.Ticker("GC=F")
 
-# Download daily historical price data for the last 5 years
-data = gold.history(period="5y", interval="1d")
+# Download daily historical price data for the last 25 years
+data = gold.history(period="max", interval="1d")
 
 # Keep only the columns we actually need
 data = data[["Open", "High", "Low", "Close", "Volume"]]

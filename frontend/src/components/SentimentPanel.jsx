@@ -27,6 +27,7 @@ export default function SentimentPanel({
 }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const [newsRegion, setNewsRegion] = useState("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -34,9 +35,8 @@ export default function SentimentPanel({
     setData(null);
     setError(null);
 
-    api
-      .sentiment(days)
-      .then((d) => {
+    const loadSentiment = () => {
+      api.sentiment(days, newsRegion).then((d) => {
         if (!cancelled) {
           setData(d);
         }
@@ -46,11 +46,16 @@ export default function SentimentPanel({
           setError(e.message);
         }
       });
+    };
+
+    loadSentiment();
+    const refreshTimer = window.setInterval(loadSentiment, 30 * 60 * 1000);
 
     return () => {
       cancelled = true;
+      window.clearInterval(refreshTimer);
     };
-  }, [days]);
+  }, [days, newsRegion]);
 
   /* =========================================================
      ERROR STATE
@@ -420,7 +425,7 @@ export default function SentimentPanel({
                 <div className="flex flex-wrap items-center gap-2">
 
                   <h3 className="text-[17px] font-medium text-[#e9e5dd] sm:text-lg lg:text-xl">
-                    Latest news
+                    Latest gold news
                   </h3>
 
                   <span className="h-1 w-1 shrink-0 rounded-full bg-[#c9a45b]/70" />
@@ -433,7 +438,7 @@ export default function SentimentPanel({
 
 
                 <p className="mt-1 text-[11px] leading-5 text-[#60656c] sm:text-xs lg:text-[13px]">
-                  Articles contributing to sentiment analysis
+                  Daily Indian and international gold headlines
                 </p>
 
               </div>
@@ -443,15 +448,29 @@ export default function SentimentPanel({
 
             {/* Article count */}
 
-            {data.news.length > 0 && (
-              <div className="self-start rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2">
-
+            <div className="flex flex-wrap items-center gap-2 self-start lg:justify-end">
+              <div className="flex rounded-lg border border-white/[0.06] bg-white/[0.02] p-1">
+                {[
+                  ["all", "All"],
+                  ["national", "India"],
+                  ["international", "International"],
+                ].map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setNewsRegion(value)}
+                    className={`rounded-md px-2.5 py-1.5 text-[9px] transition-colors ${newsRegion === value ? "bg-[#c9a45b]/10 text-[#d3af60]" : "text-[#656a70] hover:text-[#aaa]"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2">
                 <span className="font-mono text-[9px] text-[#656a70] sm:text-[10px]">
                   {data.news.length} articles
                 </span>
-
               </div>
-            )}
+            </div>
 
           </div>
 
@@ -484,7 +503,7 @@ export default function SentimentPanel({
 
 
                 <p className="mt-1 max-w-md text-center text-[10px] leading-5 text-[#4f545a] sm:text-[11px]">
-                  No articles were found in sentiment_news.csv.
+                  No articles were returned for this region and date. The daily feed refreshes automatically.
                 </p>
 
               </div>
@@ -695,6 +714,12 @@ function NewsItem({ news: n, index }) {
                     </>
                   )}
 
+                  {n.region && n.region !== "historical" && (
+                    <span className="rounded border border-[#c9a45b]/10 px-1.5 py-0.5 text-[8px] uppercase tracking-[0.08em] text-[#a8894c]">
+                      {n.region === "national" ? "India" : "International"}
+                    </span>
+                  )}
+
                 </div>
 
               </div>
@@ -708,7 +733,11 @@ function NewsItem({ news: n, index }) {
               SENTIMENT TAG
           ================================================= */}
 
-          {n.sentiment && (
+          {n.news_type === "live_headline" ? (
+            <span className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-[#c9a45b]/10 bg-[#c9a45b]/[0.035] px-2.5 py-1.5 text-[8px] font-medium uppercase tracking-[0.12em] text-[#c9a45b]/75 sm:px-3 sm:py-2 sm:text-[9px]">
+              Live · unscored
+            </span>
+          ) : n.sentiment && (
             <span
               className={`
                 inline-flex

@@ -1,4 +1,6 @@
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// Relative API paths use the Vite proxy locally and same-origin FastAPI in
+// the single-service production deployment. Separate hosts set VITE_API_URL.
+const BASE = import.meta.env.VITE_API_URL || "";
 
 async function get(path) {
   const res = await fetch(`${BASE}${path}`);
@@ -16,7 +18,13 @@ export const api = {
 
   price: (period) => get(`/api/price?period=${period}`),
 
-  sentiment: (days = 60) => get(`/api/sentiment?days=${days}`),
+  dataCoverage: () => get("/api/data-coverage"),
+
+  sentiment: (days = 60, region = "all") =>
+    get(`/api/sentiment?days=${days}&region=${encodeURIComponent(region)}`),
+
+  news: (region = "all", day = "today", limit = 100) =>
+    get(`/api/news?region=${encodeURIComponent(region)}&day=${encodeURIComponent(day)}&limit=${limit}`),
 
   macro: () => get("/api/macro"),
 

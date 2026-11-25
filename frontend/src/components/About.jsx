@@ -25,11 +25,15 @@ export default function About() {
   const [cfg, setCfg] = useState(null);
 
   useEffect(() => {
-    api.about().then(setCfg).catch(() => {});
+    let active = true;
+    const load = () => api.about().then((value) => { if (active) setCfg(value); }).catch(() => {});
+    load();
+    const timer = window.setInterval(load, 30 * 60 * 1000);
+    return () => { active = false; window.clearInterval(timer); };
   }, []);
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden bg-[#070809] text-[#eeeae2]">
+    <main className="relative w-full overflow-x-hidden text-[#eeeae2]">
 
       {/* =====================================================
           AMBIENT BACKGROUND
@@ -39,13 +43,13 @@ export default function About() {
 
       <div className="pointer-events-none absolute right-[-150px] top-[300px] h-[320px] w-[320px] rounded-full bg-[#c9a45b]/[0.025] blur-[100px] sm:h-[450px] sm:w-[450px] sm:blur-[130px]" />
 
-      <div className="relative mx-auto w-full max-w-[1700px] px-4 pb-12 sm:px-6 sm:pb-14 md:px-8 lg:px-10 xl:px-12 2xl:px-16">
+      <div className="relative mx-auto w-full max-w-[1560px] px-4 pb-12 sm:px-6 sm:pb-14 lg:px-10">
 
         {/* =====================================================
             HERO HEADER
         ===================================================== */}
 
-        <section className="relative overflow-hidden border-b border-white/[0.055] py-7 sm:py-9 lg:py-12">
+        <section className="relative overflow-hidden border-b border-white/[0.055] py-8 sm:py-10">
 
           <div className="absolute right-[-80px] top-[-160px] h-[300px] w-[300px] rounded-full bg-[#c9a45b]/[0.035] blur-[90px] sm:h-[400px] sm:w-[400px] sm:blur-[110px]" />
 
@@ -85,12 +89,12 @@ export default function About() {
                 </div>
 
 
-                <h1 className="text-[38px] font-semibold leading-[0.95] tracking-[-0.045em] text-[#f2eee6] sm:text-[46px] md:text-[54px] lg:text-[62px] xl:text-[68px]">
+                <h1 className="page-heading">
                   Gold Sentiment
                 </h1>
 
 
-                <p className="mt-4 max-w-3xl text-[14px] leading-6 text-[#73787f] sm:text-[15px] sm:leading-7 lg:mt-5 lg:text-[17px] lg:leading-8">
+                <p className="page-description mt-3 max-w-3xl">
                   Deep-learning research framework for analysing the
                   relationship between financial-news sentiment, market
                   behaviour and next-day gold price direction.
@@ -428,13 +432,13 @@ export default function About() {
                 <DatasetItem
                   icon={CalendarDays}
                   label="Data Start"
-                  value={cfg?.data_start ?? "2021-10-01"}
+                  value={cfg?.data_start ?? "—"}
                 />
 
                 <DatasetItem
                   icon={CalendarDays}
-                  label="Data End"
-                  value={cfg?.data_end ?? "2026-08-24"}
+                  label="Latest Gold Session"
+                  value={cfg?.data_end ?? "—"}
                 />
 
                 <DatasetItem
