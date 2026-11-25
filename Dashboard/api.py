@@ -28,17 +28,32 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from data_pipeline import (
-    LOCAL_TZ,
-    daily_refresh_due,
-    init_database,
-    latest_runs,
-    load_live_news as load_persisted_live_news,
-    load_stored_prices,
-    news_counts,
-    price_coverage,
-    query_news,
-)
+if __package__:
+    # Supports `uvicorn Dashboard.api:app` from the repository root.
+    from .data_pipeline import (
+        LOCAL_TZ,
+        daily_refresh_due,
+        init_database,
+        latest_runs,
+        load_live_news as load_persisted_live_news,
+        load_stored_prices,
+        news_counts,
+        price_coverage,
+        query_news,
+    )
+else:
+    # Supports `uvicorn api:app` when launched from Dashboard/.
+    from data_pipeline import (
+        LOCAL_TZ,
+        daily_refresh_due,
+        init_database,
+        latest_runs,
+        load_live_news as load_persisted_live_news,
+        load_stored_prices,
+        news_counts,
+        price_coverage,
+        query_news,
+    )
 
 warnings.filterwarnings("ignore")
 

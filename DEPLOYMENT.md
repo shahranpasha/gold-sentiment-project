@@ -43,3 +43,18 @@ headlines are not FinBERT-scored by the current pipeline, and model weights are
 not retrained automatically. Historical macro/news coverage and latest source
 dates are shown in the app; production use needs data-provider terms and
 monitoring appropriate to its audience.
+
+## Render native Python service
+
+If the Render service is configured with the native Python runtime instead of
+the repository Dockerfile, set these service fields in Render:
+
+- Root directory: repository root
+- Build command: `pip install -r requirements.txt && npm ci --prefix frontend && npm run build --prefix frontend`
+- Start command: `uvicorn Dashboard.api:app --host 0.0.0.0 --port $PORT`
+
+The frontend build step is required because FastAPI serves `frontend/dist` in a
+single-service deployment. The API import supports both the root-level Render
+command above and local launches from `Dashboard/`. Attach a persistent disk and
+set `GOLD_SENTIMENT_DB` to a path on that disk if collected news and prices
+should survive service restarts and deploys.
